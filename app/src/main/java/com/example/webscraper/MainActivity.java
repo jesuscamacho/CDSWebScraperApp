@@ -23,8 +23,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         setContentView(R.layout.activity_main);
-        result = (TextView) findViewById(R.id.result);
-        getBtn = (Button) findViewById(R.id.getBtn);
+        result = findViewById(R.id.result);
+        getBtn = findViewById(R.id.getBtn);
         getBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -42,13 +42,13 @@ public class MainActivity extends AppCompatActivity {
                 try {
                     Document doc = Jsoup.connect("https://dining.unc.edu/locations/chase/?date=2019-04-15").get();
                     String title = doc.title();
-                    Elements links = doc.select("a[href]");
+                    Elements items = doc.select(".menu-item-li a");
 
                     builder.append(title).append("\n");
 
-                    for (Element link : links) {
-                        builder.append("\n").append("Link : ").append(link.attr("href"))
-                                .append("\n").append("Text : ").append(link.text());
+                    for (Element item : items) {
+                        builder.append("\n").append("Food item : ").append(items.attr("href"))
+                                .append("\n").append("Text : ").append(items.text());
                     }
                 } catch (IOException e) {
                     builder.append("Error : ").append(e.getMessage()).append("\n");
