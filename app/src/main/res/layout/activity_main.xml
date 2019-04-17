@@ -17,15 +17,19 @@
         android:layout_marginLeft="16dp"
         android:layout_marginTop="16dp"
         android:text="Get website"/>
+    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/scroll"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <TextView
+            android:id="@+id/result"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Result ..."
+            android:layout_marginTop="30dp"
+            android:textSize="17sp"/>
+    </ScrollView>
 
-    <TextView
-        android:id="@+id/result"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Result ..."
-        android:layout_marginTop="30dp"
-        android:layout_below="@id/getBtn"
-        android:textSize="17sp"/>
     </LinearLayout>
 
     <android.support.design.widget.BottomNavigationView

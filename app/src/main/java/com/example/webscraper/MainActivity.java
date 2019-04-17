@@ -18,6 +18,9 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -67,13 +70,25 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void run() {
                 final StringBuilder builder = new StringBuilder();
+                DateFormat datef = new SimpleDateFormat("yyyy-MM-dd");
+                Date today = new Date();
 
                 try {
-                    Document doc = Jsoup.connect("https://dining.unc.edu/locations/chase/?date=2019-04-16").get();
+                    Document doc = Jsoup.connect("https://dining.unc.edu/locations/chase/?date="+datef.format(today)).get();
                     String title = doc.title();
                     Elements food_items = doc.select(".menu-item-li a");
+                    //Elements food_items = doc.select(".c-tabs-nav__link .is-active .c-tabs-nav__link-inner");
+                    //Elements food_items = doc.select(".c-tabs-nav__link .is-active .c-tabs-nav__link-inner");
                     builder.append(title).append("\n");
                     for (Element item : food_items) {
+//                        Log.v("idk","**********************");
+//                        Log.v("Food:","             text: "+item.text());
+//                        Log.v("Food:","             baseurl: "+item.html());
+//                        Log.v("Food:","             href: "+item.cssSelector());
+//                        Log.v("Food:","             tabindex: "+item.attributes());
+//
+//                        Log.v("idk","**********************");
+
                         builder.append("\n").append("\n").append("Item : ").append(item.text());
                     }
                 } catch (IOException e) {
