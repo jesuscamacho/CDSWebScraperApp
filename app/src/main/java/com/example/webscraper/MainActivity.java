@@ -1,7 +1,9 @@
 package com.example.webscraper;
 
 import android.content.ClipData;
+import android.content.Context;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
@@ -10,7 +12,12 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.ScrollView;
+import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -20,12 +27,16 @@ import org.jsoup.select.Elements;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
 
     private Button getBtn;
     private TextView result;
+    protected SQLiteDatabase db =null;
+
+
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -49,7 +60,10 @@ public class MainActivity extends AppCompatActivity {
         overridePendingTransition(0, 0);
         setContentView(R.layout.activity_main);
 
-        //setContentView(R.layout.activity_main);
+        db  =  openOrCreateDatabase("any",MODE_PRIVATE, null);
+       dbsetup();
+        //load() db into view
+
         result = findViewById(R.id.result);
         result.setText("No foods are being tracked");
         getBtn = findViewById(R.id.getBtn);
@@ -61,8 +75,6 @@ public class MainActivity extends AppCompatActivity {
         });
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
-
-
     }
 
     private void getWebsite() {
@@ -80,16 +92,12 @@ public class MainActivity extends AppCompatActivity {
                     //Elements food_items = doc.select(".c-tabs-nav__link .is-active .c-tabs-nav__link-inner");
                     //Elements food_items = doc.select(".c-tabs-nav__link .is-active .c-tabs-nav__link-inner");
                     builder.append(title).append("\n");
-                    for (Element item : food_items) {
-//                        Log.v("idk","**********************");
-//                        Log.v("Food:","             text: "+item.text());
-//                        Log.v("Food:","             baseurl: "+item.html());
-//                        Log.v("Food:","             href: "+item.cssSelector());
-//                        Log.v("Food:","             tabindex: "+item.attributes());
-//
-//                        Log.v("idk","**********************");
+                    ScrollView views = findViewById(R.id.scroll);
 
-                        builder.append("\n").append("\n").append("Item : ").append(item.text());
+                    for (Element item : food_items) {
+                        //Log.v("yaaa","--- ------ "+ item.text());
+                       // db.execSQL("insert into Food values('Chase','"+item.text().replace("'","")+"');");
+                        builder.append('\n').append('\n').append(item.text());
                     }
                 } catch (IOException e) {
                     builder.append("Error : ").append(e.getMessage()).append("\n");
@@ -104,7 +112,16 @@ public class MainActivity extends AppCompatActivity {
         }).start();
     }
 
-
-
+    private void dbsetup(){
+       // db.execSQL("Drop table if exists Food");
+        db.execSQL(" create table if not exists Food(hall text,name text);");
+        db.execSQL("Drop table if exists User");
+        db.execSQL(" create table if not exists User(food text);");
+    }
+//    private void insertFood(String hall,String name){
+//        //db.execSQL("insert into Food("+hall+","+name+");");
+//        Log.v("yaaa","--- ------ "+hall+"  "+ name);
+//        //db.execSQL(" create table if not exists user(id int,food text);");
+//    }
 
 }

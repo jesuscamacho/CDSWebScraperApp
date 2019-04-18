@@ -7,12 +7,37 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <TextView
-            android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Search here"/>
+            android:orientation="horizontal">
+        <EditText
+            android:id="@+id/query"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:autofillHints="Enter food item"
+            />
+        <Button
+            android:id="@+id/sbtn"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:text="Search"
+            android:onClick="searchFood"/>
+        </LinearLayout>
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <TextView
+                android:id="@+id/searchResult"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Result ..."
+                android:layout_marginTop="30dp"
+                android:textSize="17sp"/>
+        </ScrollView>
     </LinearLayout>
 
     <android.support.design.widget.BottomNavigationView
