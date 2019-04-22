@@ -42,8 +42,6 @@ public class MainActivity extends AppCompatActivity {
     private TextView result;
     protected SQLiteDatabase db =null;
 
-
-
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
 
