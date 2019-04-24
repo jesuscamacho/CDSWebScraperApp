@@ -133,38 +133,38 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void getWebsite() {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                final StringBuilder builder = new StringBuilder();
-                DateFormat datef = new SimpleDateFormat("yyyy-MM-dd");
-                Date today = new Date();
-
-                try {
-                    Document doc = Jsoup.connect("https://dining.unc.edu/locations/chase/?date="+datef.format(today)).get();
-                    String title = doc.title();
-                    Elements food_items = doc.select(".menu-item-li a");
-                    //Elements food_items = doc.select(".c-tabs-nav__link .is-active .c-tabs-nav__link-inner");
-                    //Elements food_items = doc.select(".c-tabs-nav__link .is-active .c-tabs-nav__link-inner");
-                    builder.append(title).append("\n");
-
-                    for (Element item : food_items) {
-                       // db.execSQL("insert into Food values('Chase','"+item.text().replace("'","")+"');");
-                        builder.append('\n').append('\n').append(item.text());
-                    }
-                } catch (IOException e) {
-                    builder.append("Error : ").append(e.getMessage()).append("\n");
-                }
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        result.setText(builder.toString());
-                    }
-                });
-            }
-        }).start();
-    }
+//    private void getWebsite() {
+//        new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                final StringBuilder builder = new StringBuilder();
+//                DateFormat datef = new SimpleDateFormat("yyyy-MM-dd");
+//                Date today = new Date();
+//
+//                try {
+//                    Document doc = Jsoup.connect("https://dining.unc.edu/locations/chase/?date="+datef.format(today)).get();
+//                    String title = doc.title();
+//                    Elements food_items = doc.select(".menu-item-li a");
+//                    //Elements food_items = doc.select(".c-tabs-nav__link .is-active .c-tabs-nav__link-inner");
+//                    //Elements food_items = doc.select(".c-tabs-nav__link .is-active .c-tabs-nav__link-inner");
+//                    builder.append(title).append("\n");
+//
+//                    for (Element item : food_items) {
+//                       // db.execSQL("insert into Food values('Chase','"+item.text().replace("'","")+"');");
+//                        builder.append('\n').append('\n').append(item.text());
+//                    }
+//                } catch (IOException e) {
+//                    builder.append("Error : ").append(e.getMessage()).append("\n");
+//                }
+//                runOnUiThread(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        result.setText(builder.toString());
+//                    }
+//                });
+//            }
+//        }).start();
+//    }
 
     private void dbsetup(){
        // db.execSQL("Drop table if exists Food");
