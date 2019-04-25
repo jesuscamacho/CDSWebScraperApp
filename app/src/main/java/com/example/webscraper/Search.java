@@ -21,8 +21,22 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QuerySnapshot;
+
+import java.util.HashMap;
+import java.util.Map;
+
 public class Search extends AppCompatActivity {
-    protected SQLiteDatabase db =null;
+    private FirebaseFirestore flame;
+    private MainActivity main;
+
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -40,6 +54,7 @@ public class Search extends AppCompatActivity {
         }
     };
 
+    private View v;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,7 +64,7 @@ public class Search extends AppCompatActivity {
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
         navigation.getMenu().getItem(1).setChecked(true);
 
-        db  =  openOrCreateDatabase("any",MODE_PRIVATE, null);
+        flame = FirebaseFirestore.getInstance();
     }
 
 
@@ -62,57 +77,76 @@ public class Search extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
-
-    protected void searchFood(View v){
+    public void here(View view) {
         EditText ed = findViewById(R.id.query);
-        String query = ed.getText().toString();
-        Cursor c = null;
-        String s = "";
-        LinearLayout linearLayout = (LinearLayout) findViewById(R.id.container);
+        final String query = ed.getText().toString();
+        final LinearLayout linearLayout = (LinearLayout) findViewById(R.id.container);
         if (!query.equals("")) {
             linearLayout.removeAllViews();
-            c = db.rawQuery("select name from Food where name like '%" + query + "%'", null);
-            c.moveToFirst();
-            for (int i = 0; i < c.getCount(); i++) {
-                for (int j = 0; j < c.getColumnCount(); j++) {
-                    /// Log.v("MYTAG","********** "+c.getString(j));
-                    // set up linear layout
-                    RelativeLayout newlayout = new RelativeLayout(this);
-                    newlayout.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT));
 
-                    // set up textview
-                    TextView item = new TextView(this);
-                    item.setText(c.getString(j));
-                    item.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
-                    newlayout.addView(item);
-                    //set up button
-                    Button btn = new Button(this);
-                    RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-                    lp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-                    btn.setText("track");
-                    btn.setLayoutParams(lp);
-                    btn.setOnClickListener(new View.OnClickListener(){
-                       @Override
-                       public void onClick(View v) {
-                           /*-----------------------TODO: ADD FOOD TO USER DB-------------------------------------*/
-                           //db.execSQL("insert into User values('Chase','"+item.text().replace("'","")+"');");
-                       }
-                    });
-                    newlayout.addView(btn);
-                    //add border
-                    GradientDrawable border = new GradientDrawable();
-                    border.setColor(0xFFFFFFFF);
-                    border.setStroke(1, 0xFF000000);
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                        newlayout.setBackground(border);
+            flame.collection("Chase").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                @Override
+                public void onComplete(Task<QuerySnapshot> e) {
+                    if (e != null) {
+                        Log.v("TAG", "ERROR");
                     }
-                    linearLayout.addView(newlayout);
+                    for (DocumentSnapshot doc : e.getResult()) {
+                        Log.v("KOKOKOKO11", "-----------" + doc.getString("item"));
+
+                        if (doc.getString("item").contains(query)) {
+                            Log.v("kokook", "" + query);
+                            final String fS = doc.getId();
+                            final String fN = doc.getString("item");
+                            RelativeLayout newlayout = new RelativeLayout(getApplicationContext());
+                            newlayout.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT));
+                            TextView item = new TextView(getApplicationContext());
+                            item.setText(doc.getString("item"));
+                            item.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+                            newlayout.addView(item);
+                            final Button btn = new Button(getApplicationContext());
+                            RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                            lp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+                                btn.setText("track");
+
+                            final boolean x = doc.getBoolean("available");
+                            final String l = doc.getString("location");
+                            btn.setLayoutParams(lp);
+                            btn.setOnClickListener(new View.OnClickListener(){
+                                @Override
+                                public void onClick(View v) {
+                                    Map<String, Object> data = new HashMap<>();
+                                    data.put("item", fN);
+                                    data.put("available", x);
+                                    data.put("location",l);
+                                    //data.put("available", false);
+                                    String foodS = fS;
+                                    if (btn.getText().equals("track")) {
+                                        btn.setText("untrack");
+                                       flame.collection("user").document(foodS).set(data);
+
+                                    } else {
+                                        btn.setText("track");
+                                       flame.collection("user").document(foodS).delete();
+
+                                    }
+                                }
+                            });
+                            newlayout.addView(btn);
+                            //add border
+                            GradientDrawable border = new GradientDrawable();
+                            border.setColor(0xFFFFFFFF);
+                            border.setStroke(1, 0xFF000000);
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                                newlayout.setBackground(border);
+                            }
+                            linearLayout.addView(newlayout);
+                        }
+                    }
                 }
-                c.moveToNext();
-            }
-            c.close();
-        }else{
+            });
+        } else {
             linearLayout.removeAllViews();
         }
     }
+
 }
